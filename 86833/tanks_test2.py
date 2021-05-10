@@ -24,6 +24,7 @@ class Player(GameSprite):
         #движение по горизонтали
         self.rect.x += self.x_speed
         platforms_touched = sprite.spritecollide(self, wallsg, False)
+        
         if self.x_speed > 0:
             for p in platforms_touched:
                 self.rect.right = min(self.rect.right, p.rect.left)
@@ -31,16 +32,31 @@ class Player(GameSprite):
         elif self.x_speed < 0:
             for p in platforms_touched:
                 self.rect.left = max(self.rect.left, p.rect.right)
+        platforms_touched2 = sprite.spritecollide(self, wscrg, False)
+        if self.x_speed > 0:
+            for p in platforms_touched2:
+                self.rect.right = min(self.rect.right, p.rect.left)
+            
+        elif self.x_speed < 0:
+            for p in platforms_touched2:
+                self.rect.left = max(self.rect.left, p.rect.right)
         #движение по вертикали
         self.rect.y += self.y_speed    
         platforms_touched = sprite.spritecollide(self, wallsg, False)
+        
         if self.y_speed > 0:
             for p in platforms_touched:
                 self.rect.bottom = min(self.rect.bottom, p.rect.top)
         elif self.y_speed < 0:
             for p in platforms_touched:
                 self.rect.top = max(self.rect.top, p.rect.bottom)
-        
+        platforms_touched2 = sprite.spritecollide(self, wscrg, False)
+        if self.y_speed > 0:
+            for p in platforms_touched2:
+                self.rect.bottom = min(self.rect.bottom, p.rect.top)
+        elif self.y_speed < 0:
+            for p in platforms_touched2:
+                self.rect.top = max(self.rect.top, p.rect.bottom)
     def shoot(self):
         bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
         bulls.add(bullet)
@@ -78,6 +94,7 @@ class Player2(GameSprite):
     def update_45(self):
         self.rect.x += self.x_speed
         platforms_touched = sprite.spritecollide(self, wallsg, False)
+        
         if self.x_speed > 0:
             for p in platforms_touched:
                 self.rect.right = min(self.rect.right, p.rect.left)
@@ -85,14 +102,30 @@ class Player2(GameSprite):
         elif self.x_speed < 0:
             for p in platforms_touched:
                 self.rect.left = max(self.rect.left, p.rect.right)
+        platforms_touched2 = sprite.spritecollide(self, wscrg, False)
+        if self.x_speed > 0:
+            for p in platforms_touched2:
+                self.rect.right = min(self.rect.right, p.rect.left)
+            
+        elif self.x_speed < 0:
+            for p in platforms_touched2:
+                self.rect.left = max(self.rect.left, p.rect.right)
         #движение по вертикали
         self.rect.y += self.y_speed    
         platforms_touched = sprite.spritecollide(self, wallsg, False)
+        
         if self.y_speed > 0:
             for p in platforms_touched:
                 self.rect.bottom = min(self.rect.bottom, p.rect.top)
         elif self.y_speed < 0:
             for p in platforms_touched:
+                self.rect.top = max(self.rect.top, p.rect.bottom)
+        platforms_touched2 = sprite.spritecollide(self, wscrg, False)
+        if self.y_speed > 0:
+            for p in platforms_touched2:
+                self.rect.bottom = min(self.rect.bottom, p.rect.top)
+        elif self.y_speed < 0:
+            for p in platforms_touched2:
                 self.rect.top = max(self.rect.top, p.rect.bottom)
     def shoot_2(self):
         bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,20,20)
@@ -150,6 +183,7 @@ bulls2 = sprite.Group()
 #bullets4 = sprite.Group()
 f = 1
 wallsg = sprite.Group()
+wscrg = sprite.Group()
 
 bullets = []
 bullets2 = []
@@ -196,6 +230,27 @@ wall5 = Walls('block.png',150,345)
 wall6 = Walls('block.png',150,410)
 wall7 = Walls('block.png',150,475)
 wall8 = Walls('block.png',150,540)
+
+ws1 = 0
+ws2 = 0
+ws3 = 0
+ws4 = 0
+for i in range(30):
+    wallscr = Walls('block.png',0+ws1,1000)
+    wscrg.add(wallscr)
+    ws1 += 65
+for i in range(16):
+    wallscr = Walls('block.png',1900,0+ws2)
+    wscrg.add(wallscr)
+    ws2 += 65
+for i in range(30):
+    wallscr = Walls('block.png',0+ws3,-65)
+    wscrg.add(wallscr)
+    ws3 += 65
+for i in range(16):
+    wallscr = Walls('block.png',-65,0+ws4)
+    wscrg.add(wallscr)
+    ws4 += 65
 wallsg.add(wall1)
 wallsg.add(wall2)
 wallsg.add(wall3)
@@ -204,6 +259,7 @@ wallsg.add(wall5)
 wallsg.add(wall6)
 wallsg.add(wall7)
 wallsg.add(wall8)
+
 while game:
     for e in event.get():
         if e.type == QUIT:
@@ -304,6 +360,7 @@ while game:
         player_2.update_45()
         player_2.reset()
         wallsg.draw(window)
+        wscrg.draw(window)
         bulls.draw(window)
         bulls2.draw(window)
         for bul in bullets:
@@ -390,4 +447,3 @@ while game:
 
         display.update() 
     clock.tick(FPS)
- 
