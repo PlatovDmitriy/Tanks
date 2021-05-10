@@ -58,22 +58,22 @@ class Player(GameSprite):
             for p in platforms_touched2:
                 self.rect.top = max(self.rect.top, p.rect.bottom)
     def shoot(self):
-        bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
+        bullet = Bullet('ener.png',self.rect.x,self.rect.y,30,30)
         bulls.add(bullet)
         bullets.append(bullet)
         
     def shoot2(self):
-        bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
+        bullet = Bullet('ener.png',self.rect.x,self.rect.y,30,30)
         bulls.add(bullet)
         bullets4.append(bullet)
  
     def shoot3(self):
-        bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
+        bullet = Bullet('ener.png',self.rect.x,self.rect.y,30,30)
         bulls.add(bullet)
         bullets2.append(bullet)
 
     def shoot4(self):
-        bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
+        bullet = Bullet('ener.png',self.rect.x,self.rect.y,30,30)
         bulls.add(bullet)
         bullets3.append(bullet)
 
@@ -128,22 +128,22 @@ class Player2(GameSprite):
             for p in platforms_touched2:
                 self.rect.top = max(self.rect.top, p.rect.bottom)
     def shoot_2(self):
-        bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,20,20)
+        bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,30,30)
         bulls2.add(bullet2)
         bullets_2.append(bullet2)
         
     def shoot2_2(self):
-        bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,20,20)
+        bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,30,30)
         bulls2.add(bullet2)
         bullets4_2.append(bullet2)
  
     def shoot3_2(self):
-        bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,20,20)
+        bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,30,30)
         bulls2.add(bullet2)
         bullets2_2.append(bullet2)
 
     def shoot4_2(self):
-        bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,20,20)
+        bullet2 = Bullet2('ener.png',self.rect.x,self.rect.y,30,30)
         bulls2.add(bullet2)
         bullets3_2.append(bullet2)
 
@@ -203,12 +203,12 @@ num_fire2 = 0
 game = True
 clock = time.Clock()
 FPS = 120
-finish = False
-start = True
+finish = True
+start = False
 w = 1900
 h = 1000
-health = 3
-health2 = 3
+health = 10
+health2 = 10
 top = 'tank_player_1_top.png'
 down = 'tank_player_1_down.png'
 left = 'tank_player_1_left.png'
@@ -220,8 +220,8 @@ right = 'tank_player_1_right.png'
 window = display.set_mode((w,h))
 background = transform.scale(image.load('background1.jpg'),(w,h))
 background2 = transform.scale(image.load('background2_menu.png'),(w,h))
-player_1 = Player(down,10,10,0,0) #сюда добавили обе скорости по 0
-player_2 = Player2('down.png',500,500,0,0)
+#player_1 = Player(down,10,10,0,0) #сюда добавили обе скорости по 0
+#player_2 = Player2('down.png',-500,-500,0,0)
 wall1 = Walls('block.png',150,150)
 wall2 = Walls('block.png',150,85)
 wall3 = Walls('block.png',150,215)
@@ -235,6 +235,8 @@ ws1 = 0
 ws2 = 0
 ws3 = 0
 ws4 = 0
+theal = 1
+t2heal = 1
 for i in range(30):
     wallscr = Walls('block.png',0+ws1,1000)
     wscrg.add(wallscr)
@@ -259,7 +261,7 @@ wallsg.add(wall5)
 wallsg.add(wall6)
 wallsg.add(wall7)
 wallsg.add(wall8)
-
+player_1_tank = 0
 while game:
     for e in event.get():
         if e.type == QUIT:
@@ -291,37 +293,69 @@ while game:
                     last_time2 = timer()
                     rec_time2 = True
         #движение теперь вот тут        
-            if e.key == K_a:
-                player_1.x_speed = -10
+            if e.key == K_a and player_1_tank == 1:
+                player_1.x_speed = -15
                 player_1.image = transform.scale(image.load(left),(65,65))
                 rg = 2
-            elif e.key == K_d:
-                player_1.x_speed = 10
+            elif e.key == K_d and player_1_tank == 1:
+                player_1.x_speed = 15
                 player_1.image = transform.scale(image.load(right),(65,65))
                 rg = 1
-            elif e.key == K_w:
-                player_1.y_speed = -10
+            elif e.key == K_w and player_1_tank == 1:
+                player_1.y_speed = -15
                 player_1.image = transform.scale(image.load(top),(65,65))
                 rg = 4
-            elif e.key == K_s:
-                player_1.y_speed = 10
+            elif e.key == K_s and player_1_tank == 1:
+                player_1.y_speed = 15
                 player_1.image = transform.scale(image.load(down),(65,65))
                 rg = 3
-            elif e.key == K_LEFT:
-                player_2.x_speed = -10
+            elif e.key == K_LEFT and player_2_tank == 1:
+                player_2.x_speed = -5
                 player_2.image = transform.scale(image.load('left.png'),(65,65))
                 sc = 2
-            elif e.key == K_RIGHT:
-                player_2.x_speed = 10
+            elif e.key == K_RIGHT and player_2_tank == 1:
+                player_2.x_speed = 5
                 player_2.image = transform.scale(image.load('right.png'),(65,65))
                 sc = 1
-            elif e.key == K_UP:
-                player_2.y_speed = -10
+            elif e.key == K_UP and player_2_tank == 1:
+                player_2.y_speed = -5
                 player_2.image = transform.scale(image.load('top.png'),(65,65))
                 sc = 4
-            elif e.key == K_DOWN:
-                player_2.y_speed = 10
+            elif e.key == K_DOWN and player_2_tank == 1:
+                player_2.y_speed = 5
                 player_2.image = transform.scale(image.load('down.png'),(65,65))
+                sc = 3
+            elif e.key == K_a and player_1_tank == 2:
+                player_1.x_speed = -5
+                player_1.image = transform.scale(image.load('left.png'),(65,65))
+                rg = 2
+            elif e.key == K_d and player_1_tank == 2:
+                player_1.x_speed = 5
+                player_1.image = transform.scale(image.load('right.png'),(65,65))
+                rg = 1
+            elif e.key == K_w and player_1_tank == 2:
+                player_1.y_speed = -5
+                player_1.image = transform.scale(image.load('top.png'),(65,65))
+                rg = 4
+            elif e.key == K_s and player_1_tank == 2:
+                player_1.y_speed = 5
+                player_1.image = transform.scale(image.load('down.png'),(65,65))
+                rg = 3
+            elif e.key == K_LEFT and player_2_tank == 2:
+                player_2.x_speed = -15
+                player_2.image = transform.scale(image.load(left),(65,65))
+                sc = 2
+            elif e.key == K_RIGHT and player_2_tank == 2:
+                player_2.x_speed = 15
+                player_2.image = transform.scale(image.load(right),(65,65))
+                sc = 1
+            elif e.key == K_UP and player_2_tank == 2:
+                player_2.y_speed = -15
+                player_2.image = transform.scale(image.load(top),(65,65))
+                sc = 4
+            elif e.key == K_DOWN and player_2_tank == 2:
+                player_2.y_speed = 15
+                player_2.image = transform.scale(image.load(down),(65,65))
                 sc = 3
         elif e.type == KEYUP:
             if e.key == K_a:
@@ -350,9 +384,22 @@ while game:
                     player_2.y_speed = 0      
     if start != True:
         window.blit(background2,(0,0))
-        display.update()
         if key.get_pressed()[K_s]:
+            player_1_tank = 2
+            player_1 = Player('down.png',10,10,0,0)
+        if key.get_pressed()[K_d]:
             player_1_tank = 1
+            player_1 = Player(down,10,10,0,0)
+        if key.get_pressed()[K_i]:
+            player_2_tank = 1
+            player_2 = Player2('down.png',10,10,0,0)
+        if key.get_pressed()[K_p]:
+            player_2_tank = 2
+            player_2 = Player2(down,10,10,0,0)
+        if key.get_pressed()[K_l]: 
+            start = True
+            finish = False
+        
     if finish != True:
         window.blit(background,(0,0))
         player_1.reset()
@@ -414,6 +461,18 @@ while game:
         collides = sprite.groupcollide(bulls, wallsg, True,True)
         collides2 = sprite.groupcollide(bulls2, wallsg, True,True)
         sprites_list3 = sprite.groupcollide(bulls,bulls2,True,True)
+        if player_1_tank == 2 and theal == 1:
+            health = 2
+            theal = 0
+        if player_1_tank == 1 and theal == 1:
+            health = 1
+            theal = 0
+        if player_2_tank == 1 and t2heal == 1:
+            health2 = 2
+            t2heal = 0
+        if player_2_tank == 2 and t2heal == 1:
+            health2 = 1
+            t2heal = 0
         if sprite.spritecollide(player_2,bulls,True):
             health2 -= 1
         if sprite.spritecollide(player_1,bulls2,True):
@@ -426,24 +485,19 @@ while game:
             text_player1_win = font1.render('Player1 WIN',1,(0,200,200)) 
             window.blit(text_player1_win,(720,460))
             finish = True
-        if health == 3:
-            text_life = font2.render('3',1,(0,255,0)) 
-            window.blit(text_life,(5,960))
         if health == 2:
             text_life = font2.render('2',1,(255,255,0)) 
             window.blit(text_life,(5,960))
         if health == 1:
             text_life = font2.render('1',1,(255,0,0)) 
             window.blit(text_life,(5,960))
-        if health2 == 3:
-            text_life = font2.render('3',1,(0,255,0)) 
-            window.blit(text_life,(1870,960))
         if health2 == 2:
             text_life = font2.render('2',1,(255,255,0)) 
             window.blit(text_life,(1870,960))
         if health2 == 1:
             text_life = font2.render('1',1,(255,0,0)) 
             window.blit(text_life,(1870,960))
+        
 
-        display.update() 
+    display.update() 
     clock.tick(FPS)

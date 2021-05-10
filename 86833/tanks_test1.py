@@ -5,13 +5,14 @@ y = 10
 x1 = 500
 y1 = 500
 font.init()
-font1 = font.Font(None,36)
+font1 = font.SysFont('Arial',36)
 BLACK = (0,0,0)
 class GameSprite(sprite.Sprite):
-    def __init__(self, player_image, player_x, player_y, player_speed):
+    def __init__(self, player_image, player_x, player_y, x_speed, y_speed):
         super().__init__()
         self.image = transform.scale(image.load(player_image),(65,65))
-        self.speed = player_speed
+        self.x_speed = x_speed #добавила скорость по x и по y
+        self.y_speed = y_speed
         self.rect = self.image.get_rect()
         self.rect.x = player_x
         self.rect.y = player_y
@@ -19,71 +20,82 @@ class GameSprite(sprite.Sprite):
         window.blit(self.image, (self.rect.x, self.rect.y))
 class Player(GameSprite):
     def update(self):
-        keys_pressed = key.get_pressed()
-        if keys_pressed[K_w] and self.rect.y > 0:
-            self.rect.y -= 15
-            global y 
-            y -= 15
-        if keys_pressed[K_s] and self.rect.y < 920:
-            self.rect.y += 15
-            y += 15
-        if keys_pressed[K_a] and self.rect.x > 0:
-            self.rect.x -= 15
-            global x 
-            x -= 15
-        if keys_pressed[K_d] and self.rect.x < 1800:
-            self.rect.x += 15
-            x += 15
+        #движение по горизонтали
+        global x
+        self.rect.x += self.x_speed
+        x += self.x_speed
+        platforms_touched = sprite.spritecollide(self, wallsg, False)
+        if self.x_speed > 0:
+            for p in platforms_touched:
+                self.rect.right = min(self.rect.right, p.rect.left)
+            
+        elif self.x_speed < 0:
+            for p in platforms_touched:
+                self.rect.left = max(self.rect.left, p.rect.right)
+        #движение по вертикали
+        global y
+        self.rect.y += self.y_speed
+        y += self.y_speed    
+        platforms_touched = sprite.spritecollide(self, wallsg, False)
+        if self.y_speed > 0:
+            for p in platforms_touched:
+                self.rect.bottom = min(self.rect.bottom, p.rect.top)
+        elif self.y_speed < 0:
+            for p in platforms_touched:
+                self.rect.top = max(self.rect.top, p.rect.bottom)
     def shoot(self):
-        bullet = Bullet('ener.png',x,y,20)
+        bullet = Bullet('ener.png',x,y,20,20)
         bulls.add(bullet)
         bullets.append(bullet)
         
     def shoot2(self):
-        bullet = Bullet('ener.png',x,y,20)
+        bullet = Bullet('ener.png',x,y,20,20)
         bulls.add(bullet)
         bullets4.append(bullet)
  
     def shoot3(self):
-        bullet = Bullet('ener.png',x,y,20)
+        bullet = Bullet('ener.png',x,y,20,20)
         bulls.add(bullet)
         bullets2.append(bullet)
 
     def shoot4(self):
-        bullet = Bullet('ener.png',x,y,20)
+        bullet = Bullet('ener.png',x,y,20,20)
         bulls.add(bullet)
         bullets3.append(bullet)
 
 
 class Bullet(GameSprite):
     def update(self):
-        self.rect.y += self.speed
+        self.rect.y += self.y_speed
         
     def update_2(self):
-        self.rect.y -= self.speed
+        self.rect.y -= self.y_speed
     
     def update_3(self):
-        self.rect.x += self.speed
+        self.rect.x += self.x_speed
         
     def update_4(self):
-        self.rect.x -= self.speed
+        self.rect.x -= self.x_speed
 class Player2(GameSprite):
     def update_45(self):
-        keys_pressed = key.get_pressed()
-        if keys_pressed[K_UP] and self.rect.y > 0:
-            self.rect.y -= 15
-            global y1 
-            y1 -= 15
-        if keys_pressed[K_DOWN] and self.rect.y < 920:
-            self.rect.y += 15
-            y1 += 15
-        if keys_pressed[K_LEFT] and self.rect.x > 0:
-            self.rect.x -= 15
-            global x1 
-            x1 -= 15
-        if keys_pressed[K_RIGHT] and self.rect.x < 1800:
-            self.rect.x += 15
-            x1 += 15
+        self.rect.x += self.x_speed
+        platforms_touched = sprite.spritecollide(self, wallsg, False)
+        if self.x_speed > 0:
+            for p in platforms_touched:
+                self.rect.right = min(self.rect.right, p.rect.left)
+            
+        elif self.x_speed < 0:
+            for p in platforms_touched:
+                self.rect.left = max(self.rect.left, p.rect.right)
+        #движение по вертикали
+        self.rect.y += self.y_speed    
+        platforms_touched = sprite.spritecollide(self, wallsg, False)
+        if self.y_speed > 0:
+            for p in platforms_touched:
+                self.rect.bottom = min(self.rect.bottom, p.rect.top)
+        elif self.y_speed < 0:
+            for p in platforms_touched:
+                self.rect.top = max(self.rect.top, p.rect.bottom)
     def shoot_2(self):
         bullet2 = Bullet2('ener.png',x1,y1,20)
         bulls2.add(bullet2)
@@ -170,8 +182,8 @@ right = 'tank_player_1_right.png'
 #left1 = 'left.png'
 window = display.set_mode((w,h))
 background = transform.scale(image.load('background1.jpg'),(w,h))
-player_1 = Player(down,10,10,10)
-player_2 = Player2(down,500,500,10)
+player_1 = Player(down,10,10,0,0)
+player_2 = Player2(down,500,500,0,0)
 wall1 = Walls('block.png',150,150)
 wall2 = Walls('block.png',150,85)
 wall3 = Walls('block.png',150,215)
@@ -205,8 +217,34 @@ while game:
                         player_1.shoot()
                     elif e.key == K_SPACE and rg == 4:
                         player_1.shoot3()        
-                        
-                if num_fire >= 1 and rec_time == False:# не 
+            if e.key == K_a:
+                player_1.x_speed = -10
+                player_1.image = transform.scale(image.load(left),(65,65))
+                rg = 2
+            elif e.key == K_d:
+                player_1.x_speed = 10
+                player_1.image = transform.scale(image.load(right),(65,65))
+                rg = 1
+            elif e.key == K_w:
+                player_1.y_speed = -10
+                player_1.image = transform.scale(image.load(top),(65,65))
+                rg = 4
+            elif e.key == K_s:
+                player_1.y_speed = 10
+                player_1.image = transform.scale(image.load(down),(65,65))
+                rg = 3
+        
+        elif e.type == KEYUP:
+            if e.key == K_a:
+                player_1.x_speed = 0
+            elif e.key == K_d:
+                player_1.x_speed = 0
+            elif e.key == K_w:
+                player_1.y_speed = 0
+            elif e.key == K_s:
+                player_1.y_speed = 0
+
+            if num_fire >= 1 and rec_time == False:
                     last_time = timer()
                     rec_time = True
                     
@@ -223,6 +261,7 @@ while game:
                         player_2.shoot3_2()
                 if num_fire2 >= 1 and rec_time2 == False:
                     last_time2 = timer()
+                    rec_time2 = True
                  
        
     if finish != True:
@@ -285,37 +324,6 @@ while game:
                 num_fire2 = 0
                 rec_time2 = False
 
-        if key.get_pressed()[K_w]:
-            player_1 = Player(top,x,y,10)
-            rg = 4
-
-        if key.get_pressed()[K_s]:
-            player_1 = Player(down,x,y,10)
-            rg = 3
-
-        if key.get_pressed()[K_a]:
-            player_1 = Player(left,x,y,10)
-            rg = 2
-
-        if key.get_pressed()[K_d]:
-            player_1 = Player(right,x,y,10)
-            rg = 1
-
-        if key.get_pressed()[K_UP]:
-            player_2 = Player2(top,x1,y1,10)
-            sc = 4
-
-        if key.get_pressed()[K_DOWN]:
-            player_2 = Player2(down,x1,y1,10)
-            sc = 3
-
-        if key.get_pressed()[K_LEFT]:
-            player_2 = Player2(left,x1,y1,10)
-            sc = 2
-
-        if key.get_pressed()[K_RIGHT]:
-            player_2 = Player2(right,x1,y1,10)
-            sc = 1
 
         display.update()
     clock.tick(FPS)
