@@ -5,10 +5,11 @@ x1 = 900
 y1 = 900
 BLACK = (0,0,0)
 class GameSprite(sprite.Sprite):
-    def __init__(self, player_image, player_x, player_y, player_speed):
+    def __init__(self, player_image, player_x, player_y, x_speed,y_speed):#добавила скорость по x и по y
         super().__init__()
         self.image = transform.scale(image.load(player_image),(65,65))
-        self.speed = player_speed
+        self.x_speed = x_speed #добавила скорость по x и по y
+        self.y_speed = y_speed
         self.rect = self.image.get_rect()
         self.rect.x = player_x
         self.rect.y = player_y
@@ -16,54 +17,74 @@ class GameSprite(sprite.Sprite):
         window.blit(self.image, (self.rect.x, self.rect.y))
 class Player(GameSprite):
     def update(self):
-        keys_pressed = key.get_pressed()
-        if keys_pressed[K_w] and self.rect.y > 0:
-            self.rect.y -= 15
-            global y 
-            y -= 15
-        elif keys_pressed[K_s] and self.rect.y < 920:
-            self.rect.y += 15
-            y += 15
-        elif keys_pressed[K_a] and self.rect.x > 0:
-            self.rect.x -= 15
-            global x 
-            x -= 15
-        elif keys_pressed[K_d] and self.rect.x < 1800:
-            self.rect.x += 15
-            x += 15
+        #движение по горизонтали
+        self.rect.x += self.x_speed
+        platforms_touched = sprite.spritecollide(self, wallsg, False)
+        if self.x_speed > 0:
+            for p in platforms_touched:
+                self.rect.right = min(self.rect.right, p.rect.left)
+            
+        elif self.x_speed < 0:
+            for p in platforms_touched:
+                self.rect.left = max(self.rect.left, p.rect.right)
+        #движение по вертикали
+        self.rect.y += self.y_speed    
+        platforms_touched = sprite.spritecollide(self, wallsg, False)
+        if self.y_speed > 0:
+            for p in platforms_touched:
+                self.rect.bottom = min(self.rect.bottom, p.rect.top)
+        elif self.y_speed < 0:
+            for p in platforms_touched:
+                self.rect.top = max(self.rect.top, p.rect.bottom)
+        
+        # keys_pressed = key.get_pressed()
+        # if keys_pressed[K_UP] and self.rect.y > 0:
+        #     self.rect.y -= 15
+        #     global y 
+        #     y -= 15
+        # if keys_pressed[K_DOWN] and self.rect.y < 920:
+        #     self.rect.y += 15
+        #     y += 15
+        # if keys_pressed[K_LEFT] and self.rect.x > 0:
+        #     self.rect.x -= 15
+        #     global x 
+        #     x -= 15
+        # if keys_pressed[K_RIGHT] and self.rect.x < 1800:
+        #     self.rect.x += 15
+        #     x += 15
     def shoot(self):
-        bullet = Bullet('ener.png',x,y,20)
+        bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
         bulls.add(bullet)
         bullets.append(bullet)
         
     def shoot2(self):
-        bullet = Bullet('ener.png',x,y,20)
+        bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
         bulls.add(bullet)
         bullets4.append(bullet)
  
     def shoot3(self):
-        bullet = Bullet('ener.png',x,y,20)
+        bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
         bulls.add(bullet)
         bullets2.append(bullet)
 
     def shoot4(self):
-        bullet = Bullet('ener.png',x,y,20)
+        bullet = Bullet('ener.png',self.rect.x,self.rect.y,20,20)
         bulls.add(bullet)
         bullets3.append(bullet)
 
 
 class Bullet(GameSprite):
     def update(self):
-        self.rect.y += self.speed
+        self.rect.y += self.y_speed
         
     def update_2(self):
-        self.rect.y -= self.speed
+        self.rect.y -= self.y_speed
     
     def update_3(self):
-        self.rect.x += self.speed
+        self.rect.x += self.x_speed
         
     def update_4(self):
-        self.rect.x -= self.speed
+        self.rect.x -= self.x_speed
         
 class Walls(sprite.Sprite):
     def __init__(self,name,cor_x, cor_y ):
@@ -111,7 +132,7 @@ right = 'tank_player_1_right.png'
 #left1 = 'left.png'
 window = display.set_mode((w,h))
 background = transform.scale(image.load('background1.jpg'),(w,h))
-player_1 = Player(down,10,10,10)
+player_1 = Player(down,10,10,0,0) #сюда добавили обе скорости по 0
 wall1 = Walls('block.png',150,150)
 wall2 = Walls('block.png',150,85)
 wall3 = Walls('block.png',150,215)
@@ -141,7 +162,35 @@ while game:
                 player_1.shoot()
             if e.key == K_SPACE and rg == 4:
                 player_1.shoot3()
-                
+        #движение теперь вот тут        
+            if e.key == K_LEFT:
+                player_1.x_speed = -10
+                player_1.image = transform.scale(image.load(left),(65,65))
+                rg = 2
+            elif e.key == K_RIGHT:
+                player_1.x_speed = 10
+                player_1.image = transform.scale(image.load(right),(65,65))
+                rg = 1
+            elif e.key == K_UP:
+                player_1.y_speed = -10
+                player_1.image = transform.scale(image.load(top),(65,65))
+                rg = 4
+            elif e.key == K_DOWN:
+                player_1.y_speed = 10
+                player_1.image = transform.scale(image.load(down),(65,65))
+                rg = 3
+        
+        elif e.type == KEYUP:
+            if e.key == K_LEFT:
+                player_1.x_speed = 0
+            elif e.key == K_RIGHT:
+                player_1.x_speed = 0
+            elif e.key == K_UP:
+                player_1.y_speed = 0
+            elif e.key == K_DOWN:
+                player_1.y_speed = 0
+        
+        
        
     if finish != True:
         window.blit(background,(0,0))
@@ -167,21 +216,22 @@ while game:
             #bulls.add(bul) 
         collides = sprite.groupcollide(bulls, wallsg, True,True)
         
-        if key.get_pressed()[K_w]:
-            player_1 = Player(top,x,y,10)
-            rg = 4
 
-        if key.get_pressed()[K_s]:
-            player_1 = Player(down,x,y,10)
-            rg = 3
+        # if key.get_pressed()[K_UP]:
+        #     player_1 = Player(top,x,y,10)
+        #     rg = 4
 
-        if key.get_pressed()[K_a]:
-            player_1 = Player(left,x,y,10)
-            rg = 2   
+        # if key.get_pressed()[K_DOWN]:
+        #     player_1 = Player(down,x,y,10)
+        #     rg = 3
 
-        if key.get_pressed()[K_d]:
-            player_1 = Player(right,x,y,10)
-            rg = 1
+        # if key.get_pressed()[K_LEFT]:
+        #     player_1 = Player(left,x,y,10)
+        #     rg = 2
+
+        # if key.get_pressed()[K_RIGHT]:
+        #     player_1 = Player(right,x,y,10)
+        #     rg = 1
         
 
         display.update()
